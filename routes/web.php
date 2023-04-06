@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LivewireController;
+use App\Http\Controllers\AlpineController;
 use PhpParser\Node\Expr\FuncCall;
 
 /*
@@ -34,3 +35,5 @@ Route::controller(LivewireController::class)
     Route::get('index', 'index');
     Route::get('register', 'register');
 });
+
+Route::get('alpine/index', [AlpineController::class, 'index']);
