@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LivewireController;
 use App\Http\Controllers\AlpineController;
+use App\Http\Controllers\EventController;
 use PhpParser\Node\Expr\FuncCall;
 
 /*
@@ -34,9 +35,7 @@ Route::prefix('manager')
 ->middleware('can:manager-higher')
 ->group(function(){
 
-    Route::get('index', function () {
-        dd('manager');
-    });
+    Route::resource('events', EventController::class);
 });
 
 Route::middleware('can:user-higher')
