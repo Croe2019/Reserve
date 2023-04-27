@@ -20,9 +20,11 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        $this->call([
-            UserSeeder::class
-        ]);
+        
         Event::factory(100)->create();
+        $this->call([
+            UserSeeder::class,
+            ReservationSeeder::class
+        ]);
     }
 }

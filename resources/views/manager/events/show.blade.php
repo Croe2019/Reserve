@@ -72,6 +72,36 @@
             </div>
         </div>
     </div>
+    <div class="py-4">
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="overflow-hidden bg-white shadow-xl sm:rounded-lg">
+                <div class="max-w-2xl mx-auto">
+                    @if (!$users->isEmpty())
+                        予約状況
+                        <table class="w-full text-left whitespace-no-wrap table-auto">
+                            <thead>
+                              <tr>
+                                <th class="px-4 py-3 text-sm font-medium tracking-wider text-gray-900 bg-gray-100 title-font">予約者名</th>
+                                <th class="px-4 py-3 text-sm font-medium tracking-wider text-gray-900 bg-gray-100 title-font">予約人数</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($reservations as $reservation)
+                                    @if(is_null($reservation['canceled_date']))
+                                        <tr>
+                                            <td class="px-4 py-3">{{ $reservation['name'] }}</td>
+                                            <td class="px-4 py-3">{{ $reservation['number_of_people'] }}</td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            </tbody>
+                        </table>  
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         flatpickr('#event_date', {
           locale     : 'ja',
