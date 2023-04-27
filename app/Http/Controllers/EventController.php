@@ -18,7 +18,17 @@ class EventController extends Controller
     public function index()
     {
         $today = Carbon::today();
+
+        $reserved_people = DB::table('reservations')
+        ->select('event_id', DB::raw('sum(number_of_people) as number_of_people'))
+        ->whereNull('canceled_date')
+        ->groupBy('event_id');
+
         $events = DB::table('events')
+        ->leftJoinSub($reserved_people, 'reserved_people',
+        function($join){
+            $join->on('events.id', '=', 'reserved_people.event_id');
+        })
         ->whereDate('start_date', '>=' ,$today)
         ->orderBy('start_date', 'asc')
         ->paginate(10);
@@ -58,11 +68,24 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
+        $reservations = [];
+
         $event = Event::findOrFail($event->id);
+        $users = $event->users;
+        foreach($users as $user)
+        {
+            $reserved_info = [
+                'name' => $user->name,
+                'number_of_people' => $user->pivot->number_of_people,
+                'canceled_date' => $user->pivot->canceled_date
+            ];
+            array_push($reservations, $reserved_info);
+        }
+        //dd($reservations);
         $event_date = $event->EventDate;
         $start_date = $event->StartTime;
         $end_date = $event->EndTime;
-        return view('manager.events.show', compact('event'));
+        return view('manager.events.show', compact('event', 'reservations' ,'users'));
     }
 
     /**
@@ -123,7 +146,16 @@ class EventController extends Controller
     public function past()
     {
         $today = Carbon::today();
+        $reserved_people = DB::table('reservations')
+        ->select('event_id', DB::raw('sum(number_of_people) as number_of_people'))
+        ->whereNull('canceled_date')
+        ->groupBy('event_id');
+
         $events = DB::table('events')
+        ->leftJoinSub($reserved_people, 'reserved_people',
+        function($join){
+            $join->on('events.id', '=', 'reserved_people.event_id');
+        })
         ->whereDate('start_date', '<', $today)
         ->orderBy('start_date', 'desc')
         ->paginate(10);
