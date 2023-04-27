@@ -4,7 +4,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            イベント詳細
+            イベント新規登録
         </h2>
     </x-slot>
 
@@ -20,52 +20,49 @@
                         </div>
                     @endif
 
-                    <form method="get" action="{{ route('events.edit', ['event' => $event->id]) }}">
+                    <form method="POST" action="{{ route('events.update', ['event' => $event->id]) }}">
+                        @csrf
+                        @method('put')
+
                         <div>
                             <x-label for="event_name" value="イベント名" />
-                            {{ $event->name }}
+                            <x-input id="event_name" class="block w-full mt-1" type="text" name="event_name" value="{{ $event->name }}" required/>
                         </div>
 
                         <div class="mt-4">
                             <x-label for="information" value="イベント詳細" />
-                            {!! nl2br(e($event->information)) !!}
+                            <x-textarea row="3" name="information" id="information" class="block w-full mt-1">{{ $event->information }}</x-textarea>
                         </div>
 
                         <div class="justify-between md:flex">
                             <div class="mt-4">
                                 <x-label for="event_date" value="イベント日付" />
-                               {{ $event->EventDate }}
+                                <x-input id="event_date" class="block w-full mt-1" type="text" name="event_date" value="{{ $event->EventDate }}" required />
                             </div>
 
                             <div class="mt-4">
                                 <x-label for="start_time" value="開始時間" />
-                                {{ $event->StartTime }}
+                                <x-input id="start_time" class="block w-full mt-1" type="text" name="start_time" value="{{ $event->StartTime }}" required />
                             </div>
 
                             <div class="mt-4">
                                 <x-label for="end_time" value="終了時間" />
-                                {{ $event->EndTime }}
+                                <x-input id="end_time" class="block w-full mt-1" type="text" name="end_time" value="{{ $event->EndTime }}" required />
                             </div>
                         </div>
 
                         <div class="items-end justify-between md:flex">
                             <div class="mt-4">
                                 <x-label for="max_people" value="定員数" />
-                                {{ $event->max_people }}
+                                <x-input id="max_people" class="block w-full mt-1" type="number" name="max_people" value="{{ $event->max_people }}" required />
                             </div>
                             <div class="flex justify-around space-x-4">
-                                @if($event->is_visible)
-                                    表示
-                                @else
-                                    非表示
-                                @endif
-                                    
+                                <input type="radio" name="is_visible" value="1" @if($event->is_visible === 1) { checked } @endif>表示
+                                <input type="radio" name="is_visible" value="0" @if($event->is_visible === 0) { checked } @endif>非表示
                             </div>
-                            @if($event->eventDate >= \Carbon\Carbon::today()->format('Y年m月d日'))
-                                <x-button class="ml-4">
-                                    編集する
-                                </x-button>
-                            @endif
+                            <x-button class="ml-4">
+                                更新する
+                            </x-button>
                         </div>
                     </form>
                 </div>

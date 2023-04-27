@@ -17,7 +17,11 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = DB::table('events')->orderBy('start_date', 'asc')->paginate(10);
+        $today = Carbon::today();
+        $events = DB::table('events')
+        ->whereDate('start_date', '>=' ,$today)
+        ->orderBy('start_date', 'asc')
+        ->paginate(10);
         return view('manager.events.index', compact('events'));
     }
 
@@ -66,7 +70,15 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        //
+        $event = Event::findOrFail($event->id);
+        $today = Carbon::today()->format('Y年m月d日');
+        if($event->eventDate < $today){
+            return abort(404);
+        }
+        $event_date = $event->EventDate;
+        $start_date = $event->StartTime;
+        $end_date = $event->EndTime;
+        return view('manager.events.edit', compact('event'));
     }
 
     /**
@@ -74,7 +86,30 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
-        //
+        $check = EventService::CountEventDuplication($request['event_date'], $request['start_time'], $request['end_time']);
+
+        if($check > 1){
+            $event = Event::findOrFail($event->id);
+            $event_date = $event->EventDate;
+            $start_date = $event->StartTime;
+            $end_date = $event->EndTime;
+            session()->flash('status', 'この時間帯にはすでに予約があります。');
+            return view('manager.events.edit', compact('event', 'event_date', 'start_date', 'end_date'));
+        }
+
+        $startDate = EventService::JoinDateAndTime($request['event_date'], $request['start_time']);
+        $endDate = EventService::JoinDateAndTime($request['event_date'], $request['end_time']);
+        $event = Event::findOrFail($event->id);
+        $event->name = $request['event_name'];
+        $event->information = $request['information'];
+        $event->start_date = $startDate;
+        $event->end_date = $endDate;
+        $event->max_people = $request['max_people'];
+        $event->is_visible = $request['is_visible'];
+
+        $event->save();
+        session()->flash('status', '更新しました');
+        return to_route('events.index');
     }
 
     /**
@@ -83,5 +118,16 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         //
+    }
+
+    public function past()
+    {
+        $today = Carbon::today();
+        $events = DB::table('events')
+        ->whereDate('start_date', '<', $today)
+        ->orderBy('start_date', 'desc')
+        ->paginate(10);
+
+        return view('manager.events.past', compact('events'));
     }
 }

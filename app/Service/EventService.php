@@ -39,5 +39,16 @@ class EventService
 
         ]);
     }
+
+    public static function CountEventDuplication($event_date, $start_time, $end_time)
+    {
+        $check = DB::table('events')
+        ->whereDate('start_date', $event_date)
+        ->whereTime('end_date', '>', $start_time)
+        ->whereTime('start_date', '<', $end_time)
+        ->count();
+
+        return $check;
+    }
     
 }
