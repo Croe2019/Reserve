@@ -51,4 +51,20 @@ class EventService
         return $check;
     }
     
+    public static function GetWeekEvents($start_date, $end_date)
+    {
+        $reserved_people = DB::table('reservations')
+        ->select('event_id', DB::raw('sum(number_of_people) as number_of_people'))
+        ->whereNull('canceled_date')
+        ->groupBy('event_id');
+
+        return DB::table('events')
+        ->leftJoinSub($reserved_people, 'reserved_people',
+        function($join){
+            $join->on('events.id', '=', 'reserved_people.event_id');
+        })
+        ->whereBetween('events.start_date', [$start_date, $end_date])
+        ->orderBy('start_date', 'asc')
+        ->get();
+    }
 }

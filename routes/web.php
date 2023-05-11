@@ -18,7 +18,7 @@ use PhpParser\Node\Expr\FuncCall;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('calendar');
 });
 
 Route::middleware([
