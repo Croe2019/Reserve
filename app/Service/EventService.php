@@ -67,4 +67,23 @@ class EventService
         ->orderBy('start_date', 'asc')
         ->get();
     }
+
+    public static function GetIndexData()
+    {
+        $today = Carbon::today();
+
+        $reserved_people = DB::table('reservations')
+        ->select('event_id', DB::raw('sum(number_of_people) as number_of_people'))
+        ->whereNull('canceled_date')
+        ->groupBy('event_id');
+
+        $events = DB::table('events')
+        ->leftJoinSub($reserved_people, 'reserved_people',
+        function($join){
+            $join->on('events.id', '=', 'reserved_people.event_id');
+        })
+        ->whereDate('start_date', '>=' ,$today)
+        ->orderBy('start_date', 'asc')
+        ->paginate(10);
+    }
 }
