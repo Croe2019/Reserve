@@ -81,7 +81,7 @@ class EventController extends Controller
             ];
             array_push($reservations, $reserved_info);
         }
-        //dd($reservations);
+        
         $event_date = $event->EventDate;
         $start_date = $event->StartTime;
         $end_date = $event->EndTime;

@@ -23,13 +23,16 @@
                         @if (!is_null($events->firstWhere('start_date', 
                             $current_week[$i]['check_day']. " ".\Constant::EVENT_TIME[$j])))
                             @php
+                                $event_id = $events->firstWhere('start_date', $current_week[$i]['check_day']. " ".\Constant::EVENT_TIME[$j])->id;
                                 $event_name = $events->firstWhere('start_date', $current_week[$i]['check_day']. " ".\Constant::EVENT_TIME[$j])->name;
                                 $event_info = $events->firstWhere('start_date', $current_week[$i]['check_day']. " ".\Constant::EVENT_TIME[$j]);
                                 $event_period = \Carbon\Carbon::parse($event_info->start_date)->diffInMinutes($event_info->end_date) / 30 - 1;
                             @endphp
-                            <div class="h-8 px-2 py-1 text-xs text-center bg-blue-100 border border-gray-200">
-                                {{ $event_name }}
-                            </div>
+                            <a href="{{ route('events.detail', ['id' => $event_id]) }}">
+                                <div class="h-8 px-2 py-1 text-xs text-center bg-blue-100 border border-gray-200">
+                                    {{ $event_name }}
+                                </div>
+                            </a>
                             @if ($event_period > 0)
                                 @for ($k = 0; $k < $event_period; $k++)
                                 <div class="h-8 px-2 py-1 text-center bg-blue-100 border border-gray-200"></div>
